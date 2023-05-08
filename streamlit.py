@@ -11,6 +11,8 @@ import re
 from bs4 import BeautifulSoup as bs
 from io import BytesIO
 import numpy as np
+from urllib3.util import Retry
+from requests.adapters import HTTPAdapter
 
 
 class Creat_Card:
