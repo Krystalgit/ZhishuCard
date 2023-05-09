@@ -181,7 +181,8 @@ class Creat_Card:
 if __name__ == '__main__':
     c = Creat_Card()
     # df = c.index_hist_data('000300')
-    df = c.get_index_merge('000300')
+    # df = c.get_index_merge('000300')
     # d = c.draw_card('1304816142', istop=True)
     # c.get_barinfo('010806')
     # c.draw_line_chart()
+    c.streamlit()
