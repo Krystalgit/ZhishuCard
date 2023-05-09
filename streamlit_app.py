@@ -1,19 +1,13 @@
-import random
-import string
+import os
 from datetime import datetime
+
+import numpy as np
+import pandas as pd
 import requests
 import streamlit as st
-import pandas as pd
-from scipy.stats import rankdata
-from PIL import Image, ImageDraw, ImageFont, ImageFilter
-import os
-import bs4
-import re
-from bs4 import BeautifulSoup as bs
-from io import BytesIO
-import numpy as np
-from urllib3.util import Retry
 from requests.adapters import HTTPAdapter
+from scipy.stats import rankdata
+from urllib3.util import Retry
 
 
 class Creat_Card:
