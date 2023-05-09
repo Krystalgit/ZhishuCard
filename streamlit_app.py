@@ -9,6 +9,11 @@ from requests.adapters import HTTPAdapter
 from scipy.stats import rankdata
 from urllib3.util import Retry
 
+from snapshot_selenium import snapshot as driver
+import pyecharts.options as opts
+from pyecharts.charts import Line
+from pyecharts.render import make_snapshot
+
 
 class Creat_Card:
     def __init__(self):
@@ -331,7 +336,7 @@ class Creat_Card:
             gz = np.nan
         return gz
 
-    def get_index_merge(self, index):
+    def get_index_merge(self, index='000300'):
         self.status = '正在获取指数估值数据...'
         df1 = self.index_data(index)
         if df1.empty is True:
@@ -362,18 +367,48 @@ class Creat_Card:
         df['GZ_LN'] = df['PE_LN'].map(lambda x: self.jud_gzlvl(x))
         return df
 
+    def line_chart(self, x_data, y_data) -> Line:
+        c = (
+            Line()
+                .set_global_opts(
+                tooltip_opts=opts.TooltipOpts(is_show=False),
+                xaxis_opts=opts.AxisOpts(type_="category"),
+                yaxis_opts=opts.AxisOpts(
+                    type_="value",
+                    axistick_opts=opts.AxisTickOpts(is_show=True),
+                    splitline_opts=opts.SplitLineOpts(is_show=True),
+                ),
+            )
+                .add_xaxis(xaxis_data=x_data)
+                .add_yaxis(
+                series_name="",
+                y_axis=y_data,
+                symbol="emptyCircle",
+                is_symbol_show=True,
+                label_opts=opts.LabelOpts(is_show=False),
+            )
+                # .render("basic_line_chart.html")
+        )
+        return c
+
+    def draw_line_chart(self, index='000300'):
+        df = self.get_index_merge(index)
+        # print(self.line_chart(df['DATE'], df['PE']))
+        img = make_snapshot(driver, self.line_chart(df['DATE'], df['PE']).render(), "line.png")
+        return img
+
     def streamlit(self):
         st.header('test')
         st.text(self.status)
         index = st.text_input('输入指数代码', '000905')
-        df = self.get_index_merge(index)
+        # df = self.get_index_merge(index)
 
-        st.dataframe(df, height=df.shape[0] * 35)
-
+        img = self.draw_line_chart(index)
+        st.image(img)
 
 if __name__ == '__main__':
     c = Creat_Card()
     # df = c.get_article_data('1304110194')
     # d = c.draw_card('1304816142', istop=True)
     # c.get_barinfo('010806')
-    c.streamlit()
+    c.draw_line_chart()
