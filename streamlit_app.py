@@ -9,10 +9,11 @@ from requests.adapters import HTTPAdapter
 from scipy.stats import rankdata
 from urllib3.util import Retry
 
-from snapshot_selenium import snapshot as driver
+from snapshot_phantomjs import snapshot as driver
 import pyecharts.options as opts
 from pyecharts.charts import Line
 from pyecharts.render import make_snapshot
+
 
 
 class Creat_Card:
