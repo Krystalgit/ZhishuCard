@@ -30,6 +30,7 @@ class Creat_Card:
             'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, '
                           'like Gecko) Chrome/46.0.2490.76 Mobile Safari/537.36',
         }
+        self.status = ''
 
     def index_data(self, index):
         if index == '931409':
@@ -337,6 +338,7 @@ class Creat_Card:
         return gz
 
     def get_index_merge(self, index):
+        self.status = '正在获取指数估值数据...'
         df1 = self.index_data(index)
         if df1.empty is True:
             return
@@ -344,9 +346,11 @@ class Creat_Card:
         start_date = DATE.min().strftime('%Y-%m-%d')
         # start_date = '19700101'
         end_date = DATE.max().strftime('%Y-%m-%d')
+        self.status = '正在获取指数历史数据...'
         df2 = self.get_index_hist(index, start_date, end_date)
         if df2 is None:
             return
+        self.status = '正在合并数据...'
         df = df1.merge(df2, left_on='DATE', right_on='DATE', how='left')
         df['INDEX'] = index
         df['_id'] = df.apply(lambda x: pd.to_datetime(x.DATE).strftime('%Y-%m-%d') + '_' + str(index), axis=1)
@@ -366,6 +370,7 @@ class Creat_Card:
 
     def streamlit(self):
         st.header('test')
+        st.text(self.status)
         index = st.text_input('输入指数代码', '000905')
         df = self.get_index_merge(index)
 
