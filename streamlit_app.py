@@ -89,6 +89,24 @@ class Creat_Card:
         df = df.rename(columns={'PDATE': 'DATE', 'PERCENTPRICE': 'CLOSE', 'CHGRT': 'SYL'})
         return df
 
+    def index_hist_date_leetlab(self, index: str) -> pd.DataFrame:
+        url = 'https://data.leetab.com/index/daily'
+        data = {
+            'fields': ["pe_ttm", "cp"],
+            'startDate': '2003-05-11',
+            'stockCodes': [index],
+        }
+        headers = {
+            'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/113.0.0.0 Safari/537.36 Edg/113.0.1774.35',
+            'origin': 'https://leetab.com',
+            'referer': 'https://leetab.com/',
+        }
+        res = self.session.post(url=url, json=data, headers=headers)
+        df = pd.DataFrame(res.json()['data']).rename(columns=dict(cp='CLOSE', date='DATE', pe_ttm='PE'))
+        df['DATE'] = df['DATE'].map(lambda x: pd.to_datetime(x).date())
+        df = df[['DATE', 'CLOSE', 'PE']]
+        return df
+
     def cal_pe100(self, i, series):
         pe100 = (rankdata(series, 'min') - 1) / len(series)
         dic = dict(zip(series, pe100))
@@ -137,7 +155,8 @@ class Creat_Card:
         if df1.empty is True:
             return
         # self.status = '正在获取指数历史数据...'
-        df2 = self.index_hist_data(index)
+        # df2 = self.index_hist_data(index)  # 天天基金的接口，历史只有近8年数据
+        df2 = self.index_hist_date_leetlab(index)  # leetlab接口，2003年5月10以来的所有数据
         if df2 is None:
             return
         # self.status = '正在合并数据...'
